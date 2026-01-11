@@ -1,0 +1,65 @@
+service: security-questionnaire-result
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  deploymentBucket:
+    name: security-questionnaire-deployment
+  httpApi:
+    id:
+      Fn::ImportValue: security-questionnaire-infrastructure-${self:provider.stage}-HttpApiId
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
+    REGION: ${self:provider.region}
+
+custom:
+  go:
+    baseDir: cmd/api
+    binDir: .bin
+    cgo: 0
+    cmd: GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o bootstrap
+    monorepo: true
+
+plugins:
+  - serverless-go-plugin
+
+functions:
+  handler:
+    name: security-questionnaire-result-handler
+    runtime: provided.al2
+    handler: bootstrap
+    events:
+      - httpApi:
+          path: /results
+          method: POST
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /results
+          method: GET
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /results/{id}
+          method: GET
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /results/{id}
+          method: PUT
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /results/{id}
+          method: DELETE
+          authorizer:
+            type: aws_iam
+
+resources:
+  Outputs:
+    FunctionArn:
+      Description: Result Handler Lambda Function ARN
+      Value: !GetAtt HandlerLambdaFunction.Arn

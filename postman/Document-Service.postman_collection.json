@@ -1,0 +1,210 @@
+{
+	"info": {
+		"_postman_id": "security-questionnaire-document-service",
+		"name": "Security Questionnaire - Document Service",
+		"description": "Complete API collection for Document Service with AWS IAM authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Document",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"file_name\": \"sample-document.pdf\",\n  \"file_content\": \"{{base64_sample_file}}\",\n  \"content_type\": \"application/pdf\",\n  \"description\": \"Sample security questionnaire document\",\n  \"tags\": \"questionnaire, security, sample\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/documents",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"documents"
+					]
+				},
+				"description": "Upload a new document to S3 and create a database entry.\n\nRequired fields:\n- file_name: Name of the file\n- file_content: Base64 encoded file content\n- content_type: MIME type (e.g., application/pdf)\n\nOptional fields:\n- description: Document description\n- tags: Comma-separated tags"
+			},
+			"response": []
+		},
+		{
+			"name": "List Documents",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/documents?limit=10&offset=0",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"documents"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "10",
+							"description": "Number of documents per page (default: 10)"
+						},
+						{
+							"key": "offset",
+							"value": "0",
+							"description": "Number of documents to skip (default: 0)"
+						}
+					]
+				},
+				"description": "Retrieve a paginated list of all documents.\n\nQuery parameters:\n- limit: Number of documents to return (default: 10)\n- offset: Number of documents to skip for pagination (default: 0)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Document",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/documents/{{document_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"documents",
+						"{{document_id}}"
+					]
+				},
+				"description": "Retrieve a specific document by ID.\n\nReturns:\n- Document metadata\n- Pre-signed download URL (valid for 1 hour)\n\nSet the document_id variable with a valid UUID."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Document",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"Updated description for the document\",\n  \"tags\": \"updated, tags, security\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/documents/{{document_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"documents",
+						"{{document_id}}"
+					]
+				},
+				"description": "Update document metadata (description and tags only).\n\nUpdatable fields:\n- description: New description\n- tags: New comma-separated tags\n\nNote: File content cannot be updated. Delete and recreate for new content."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Document",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/documents/{{document_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"documents",
+						"{{document_id}}"
+					]
+				},
+				"description": "Delete a document permanently.\n\nThis will:\n1. Delete the file from S3\n2. Remove the database record\n\nWarning: This action cannot be undone!"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "awsv4",
+		"awsv4": [
+			{
+				"key": "accessKey",
+				"value": "{{aws_access_key}}",
+				"type": "string"
+			},
+			{
+				"key": "secretKey",
+				"value": "{{aws_secret_key}}",
+				"type": "string"
+			},
+			{
+				"key": "region",
+				"value": "{{aws_region}}",
+				"type": "string"
+			},
+			{
+				"key": "service",
+				"value": "execute-api",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-generate base64 for sample file if needed",
+					"if (!pm.variables.get('base64_sample_file')) {",
+					"    // Sample PDF content (base64 encoded 'Sample Document Content')",
+					"    pm.variables.set('base64_sample_file', 'U2FtcGxlIERvY3VtZW50IENvbnRlbnQ=');",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-save document_id from Create response",
+					"if (pm.request.method === 'POST' && pm.response.code === 201) {",
+					"    var jsonData = pm.response.json();",
+					"    if (jsonData.data && jsonData.data.id) {",
+					"        pm.environment.set('document_id', jsonData.data.id);",
+					"        console.log('Document ID saved:', jsonData.data.id);",
+					"    }",
+					"}",
+					"",
+					"// Log response for debugging",
+					"console.log('Status:', pm.response.code);",
+					"console.log('Response:', pm.response.json());"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://kmqi5w0la0.execute-api.us-east-1.amazonaws.com",
+			"type": "string"
+		},
+		{
+			"key": "aws_region",
+			"value": "us-east-1",
+			"type": "string"
+		},
+		{
+			"key": "document_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

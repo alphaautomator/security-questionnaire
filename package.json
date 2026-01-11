@@ -1,0 +1,17 @@
+{
+  "name": "security-questionnaire",
+  "version": "1.0.0",
+  "description": "Security Questionnaire Microservices Backend",
+  "scripts": {
+    "deploy": "make deploy-all",
+    "deploy:infra": "make deploy-infra",
+    "deploy:document": "make deploy-document",
+    "deploy:result": "make deploy-result",
+    "remove": "make delete-all"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-export-outputs": "^1.0.2",
+    "serverless-go-plugin": "^1.2.1"
+  }
+}

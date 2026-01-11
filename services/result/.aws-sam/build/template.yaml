@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Result Service - Microservice for result management
+Parameters:
+  DatabaseURL:
+    Type: String
+    Description: Supabase PostgreSQL connection string
+    NoEcho: true
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+    - dev
+    - prod
+    Description: Deployment stage
+  ApiId:
+    Type: String
+    Default: kmqi5w0la0
+    Description: Existing API Gateway ID
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: provided.al2
+    Architectures:
+    - arm64
+    Environment:
+      Variables:
+        DATABASE_URL:
+          Ref: DatabaseURL
+        REGION:
+          Ref: AWS::Region
+Resources:
+  ResultHandler:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+      SamResourceId: ResultHandler
+    Properties:
+      FunctionName: security-questionnaire-result-handler
+      CodeUri: ResultHandler
+      Handler: bootstrap
+Outputs:
+  FunctionArn:
+    Description: Result Handler Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - ResultHandler
+      - Arn
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}-FunctionArn
+  FunctionName:
+    Description: Result Handler Lambda Function Name
+    Value:
+      Ref: ResultHandler
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}-FunctionName

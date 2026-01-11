@@ -1,0 +1,63 @@
+service: security-questionnaire-infrastructure
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  deploymentBucket:
+    name: security-questionnaire-deployment
+
+resources:
+  Resources:
+    # Shared HTTP API Gateway
+    HttpApi:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Name: security-questionnaire-api-${self:provider.stage}
+        ProtocolType: HTTP
+        CorsConfiguration:
+          AllowOrigins:
+            - "*"
+          AllowHeaders:
+            - "*"
+          AllowMethods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          MaxAge: 3000
+    
+    # API Stage
+    HttpApiStage:
+      Type: AWS::ApiGatewayV2::Stage
+      Properties:
+        ApiId: !Ref HttpApi
+        StageName: ${self:provider.stage}
+        AutoDeploy: true
+
+  Outputs:
+    HttpApiId:
+      Description: HTTP API Gateway ID
+      Value: !Ref HttpApi
+      Export:
+        Name: ${self:service}-${self:provider.stage}-HttpApiId
+    
+    HttpApiUrl:
+      Description: HTTP API Gateway URL
+      Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}"
+      Export:
+        Name: ${self:service}-${self:provider.stage}-HttpApiUrl
+
+# Shared plugins configuration for services
+plugins:
+  - serverless-go-plugin
+
+custom:
+  go:
+    # Global Go build settings for all services
+    cgo: 0
+    cmd: GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o bootstrap
+    monorepo: true

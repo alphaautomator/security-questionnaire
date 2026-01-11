@@ -1,0 +1,107 @@
+service: security-questionnaire-document
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  deploymentBucket:
+    name: security-questionnaire-deployment
+  httpApi:
+    id:
+      Fn::ImportValue: security-questionnaire-infrastructure-${self:provider.stage}-HttpApiId
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
+    S3_BUCKET: ${self:custom.bucketName}
+    S3_REGION: ${self:provider.region}
+    REGION: ${self:provider.region}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+            - s3:ListBucket
+          Resource:
+            - arn:aws:s3:::${self:custom.bucketName}/*
+            - arn:aws:s3:::${self:custom.bucketName}
+
+custom:
+  bucketName: security-questionnaire-document
+  go:
+    baseDir: cmd/api
+    binDir: .bin
+    cgo: 0
+    cmd: GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o bootstrap
+    monorepo: true
+
+plugins:
+  - serverless-go-plugin
+
+functions:
+  handler:
+    name: security-questionnaire-document-handler
+    runtime: provided.al2
+    handler: bootstrap
+    events:
+      - httpApi:
+          path: /documents
+          method: POST
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /documents
+          method: GET
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /documents/{id}
+          method: GET
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /documents/{id}
+          method: PUT
+          authorizer:
+            type: aws_iam
+      - httpApi:
+          path: /documents/{id}
+          method: DELETE
+          authorizer:
+            type: aws_iam
+
+resources:
+  Resources:
+    DocumentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+              AllowedOrigins:
+                - "*"
+              MaxAge: 3000
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
+  Outputs:
+    FunctionArn:
+      Description: Document Handler Lambda Function ARN
+      Value: !GetAtt HandlerLambdaFunction.Arn
+    
+    S3BucketName:
+      Description: S3 bucket name for documents
+      Value: !Ref DocumentsBucket
