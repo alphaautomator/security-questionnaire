@@ -31,7 +31,7 @@ type CreateDocumentResponse struct {
 }
 
 // HandleCreate handles the creation of a new document
-func HandleCreate(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleCreate(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {

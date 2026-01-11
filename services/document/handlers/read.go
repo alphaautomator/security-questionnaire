@@ -15,15 +15,15 @@ import (
 
 // ReadDocumentResponse represents the response for reading a document
 type ReadDocumentResponse struct {
-	Success        bool            `json:"success"`
-	Message        string          `json:"message"`
-	Data           *models.Document `json:"data,omitempty"`
-	DownloadURL    string          `json:"download_url,omitempty"`
-	URLExpiresIn   string          `json:"url_expires_in,omitempty"`
+	Success      bool             `json:"success"`
+	Message      string           `json:"message"`
+	Data         *models.Document `json:"data,omitempty"`
+	DownloadURL  string           `json:"download_url,omitempty"`
+	URLExpiresIn string           `json:"url_expires_in,omitempty"`
 }
 
 // HandleRead handles reading a document by ID
-func HandleRead(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleRead(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {

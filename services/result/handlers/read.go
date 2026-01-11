@@ -14,7 +14,7 @@ type ReadResultResponse struct {
 }
 
 // HandleRead handles reading a result by ID
-func HandleRead(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleRead(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Get result ID from path parameters
 	resultID := request.PathParameters["id"]
 	if resultID == "" {

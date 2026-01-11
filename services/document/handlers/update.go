@@ -20,13 +20,13 @@ type UpdateDocumentRequest struct {
 
 // UpdateDocumentResponse represents the response for updating a document
 type UpdateDocumentResponse struct {
-	Success bool            `json:"success"`
-	Message string          `json:"message"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
 	Data    *models.Document `json:"data,omitempty"`
 }
 
 // HandleUpdate handles updating a document's metadata
-func HandleUpdate(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleUpdate(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {

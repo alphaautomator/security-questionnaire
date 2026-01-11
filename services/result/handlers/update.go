@@ -21,7 +21,7 @@ type UpdateResultResponse struct {
 }
 
 // HandleUpdate handles updating a result
-func HandleUpdate(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleUpdate(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Get result ID from path parameters
 	resultID := request.PathParameters["id"]
 	if resultID == "" {

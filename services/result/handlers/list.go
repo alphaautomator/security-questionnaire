@@ -15,7 +15,7 @@ type ListResultsResponse struct {
 }
 
 // HandleList handles listing all results
-func HandleList(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleList(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// TODO: Implement result listing logic
 
 	response := ListResultsResponse{

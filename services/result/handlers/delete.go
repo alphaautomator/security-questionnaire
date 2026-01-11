@@ -13,7 +13,7 @@ type DeleteResultResponse struct {
 }
 
 // HandleDelete handles deleting a result by ID
-func HandleDelete(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleDelete(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Get result ID from path parameters
 	resultID := request.PathParameters["id"]
 	if resultID == "" {

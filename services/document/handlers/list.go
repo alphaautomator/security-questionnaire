@@ -23,7 +23,7 @@ type ListDocumentsResponse struct {
 }
 
 // HandleList handles listing all documents with pagination
-func HandleList(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleList(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -67,7 +67,7 @@ func HandleList(ctx context.Context, request events.APIGatewayProxyRequest) (eve
 		Data:    documents,
 		Total:   total,
 		Limit:   limit,
-		Offset:   offset,
+		Offset:  offset,
 	}
 
 	return SuccessResponse(200, response)

@@ -22,7 +22,7 @@ type CreateResultResponse struct {
 }
 
 // HandleCreate handles the creation of a new result
-func HandleCreate(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleCreate(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Parse request body
 	var req CreateResultRequest
 	if err := json.Unmarshal([]byte(request.Body), &req); err != nil {

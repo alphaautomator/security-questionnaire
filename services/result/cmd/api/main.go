@@ -9,10 +9,13 @@ import (
 )
 
 // Router handles all API requests and routes them to appropriate handlers
-func Router(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	// Route based on HTTP method and path
-	method := request.HTTPMethod
-	path := request.Path
+func Router(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+	// Route based on HTTP method and path (HTTP API V2 format)
+	method := request.RequestContext.HTTP.Method
+	path := request.RawPath
+	if path == "" {
+		path = request.RequestContext.HTTP.Path
+	}
 
 	// Handle different routes
 	switch {

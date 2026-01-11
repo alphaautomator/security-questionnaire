@@ -19,7 +19,7 @@ type DeleteDocumentResponse struct {
 }
 
 // HandleDelete handles deleting a document by ID
-func HandleDelete(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleDelete(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
