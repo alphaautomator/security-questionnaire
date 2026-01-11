@@ -31,19 +31,19 @@ func Router(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events
 	switch {
 	case method == "POST" && path == "/dev/documents":
 		return handlers.HandleCreate(ctx, request)
-	
+
 	case method == "GET" && path == "/dev/documents":
 		return handlers.HandleList(ctx, request)
-	
+
 	case method == "GET" && request.PathParameters["id"] != "":
 		return handlers.HandleRead(ctx, request)
-	
+
 	case method == "PUT" && request.PathParameters["id"] != "":
 		return handlers.HandleUpdate(ctx, request)
-	
+
 	case method == "DELETE" && request.PathParameters["id"] != "":
 		return handlers.HandleDelete(ctx, request)
-	
+
 	default:
 		return handlers.NotFoundResponse()
 	}
