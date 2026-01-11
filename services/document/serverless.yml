@@ -31,20 +31,18 @@ provider:
 
 custom:
   bucketName: security-questionnaire-document
-  go:
-    baseDir: cmd/api
-    binDir: .bin
-    cgo: 0
-    cmd: GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o bootstrap
-    monorepo: true
 
-plugins:
-  - serverless-go-plugin
+package:
+  individually: true
+  patterns:
+    - '!./**'           # Exclude EVERYTHING
+    - 'bootstrap'       # Include ONLY bootstrap binary
 
 functions:
   handler:
     name: security-questionnaire-document-handler
     runtime: provided.al2
+    architecture: arm64
     handler: bootstrap
     events:
       - httpApi:

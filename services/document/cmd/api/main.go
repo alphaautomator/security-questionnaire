@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"security-questionnaire/services/document/handlers"
-
+	"fmt"
+	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -13,6 +14,14 @@ func Router(ctx context.Context, request events.APIGatewayProxyRequest) (events.
 	// Route based on HTTP method and path
 	method := request.HTTPMethod
 	path := request.Path
+
+	// print stringify request or full object in json format
+	jsonRequest, err := json.Marshal(request)
+	if err != nil {
+		fmt.Println("error marshalling request:", err)
+	}
+	fmt.Println("request:", string(jsonRequest))
+	// 	fmt.Println("method:", request)
 
 	// Handle different routes
 	switch {

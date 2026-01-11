@@ -1,8 +1,31 @@
-node_modules
-.serverless
-.bin
+# Binaries
+bootstrap
+bin/
+.bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Node modules
+node_modules/
+
+# Serverless
+.serverless/
+
+# Environment
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

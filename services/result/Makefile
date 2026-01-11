@@ -1,15 +1,24 @@
 .PHONY: deploy deploy-prod remove test deps clean help
 
+# Build the binary
+build:
+	@echo "Building Result Service..."
+	@cd ../.. && GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build \
+		-ldflags="-s -w" \
+		-o services/result/bootstrap \
+		./services/result/cmd/api
+	@echo "✓ Build complete"
+
 # Deploy to development stage
-deploy:
+deploy: build
 	@echo "Deploying Result Service (dev)..."
-	@cd ../.. && serverless deploy --config services/result/serverless.yml --stage dev
+	@npx serverless deploy --stage dev
 	@echo "Deployment complete!"
 
 # Deploy to production stage
-deploy-prod:
+deploy-prod: build
 	@echo "Deploying Result Service (prod)..."
-	@cd ../.. && serverless deploy --config services/result/serverless.yml --stage prod
+	@npx serverless deploy --stage prod
 	@echo "Production deployment complete!"
 
 # Remove/delete stack
@@ -39,7 +48,7 @@ deps:
 # Clean build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
-	@rm -rf .serverless .bin
+	@rm -rf .serverless .bin bootstrap
 	@echo "Clean complete!"
 
 # Show service info

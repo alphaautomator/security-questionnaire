@@ -16,20 +16,24 @@ provider:
     REGION: ${self:provider.region}
 
 custom:
-  go:
-    baseDir: cmd/api
-    binDir: .bin
-    cgo: 0
-    cmd: GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o bootstrap
-    monorepo: true
 
-plugins:
-  - serverless-go-plugin
+hooks:
+  before:package:createDeploymentArtifacts:
+    - cd ../.. && GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-s -w" -o services/result/bootstrap ./services/result/cmd/api
+  after:remove:remove:
+    - rm -f bootstrap
+
+package:
+  individually: true
+  patterns:
+    - '!./**'           # Exclude EVERYTHING
+    - 'bootstrap'       # Include ONLY bootstrap binary
 
 functions:
   handler:
     name: security-questionnaire-result-handler
     runtime: provided.al2
+    architecture: arm64
     handler: bootstrap
     events:
       - httpApi:
